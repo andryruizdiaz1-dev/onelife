@@ -114,6 +114,32 @@ export default function Simulador() {
       'Tu situación es sólida. Podrías evaluar invertir o diversificar.';
   }
 
+  /* =======================
+     ETAPA DE VIDA (NUEVO)
+  ======================= */
+  let etapaVida = '';
+  let mensajeEtapa = '';
+
+  const edadNumero = Number(edad);
+
+  if (edadNumero < 30) {
+    etapaVida = 'Construcción';
+    mensajeEtapa =
+      'Etapa asociada al desarrollo de hábitos y bases financieras de largo plazo.';
+  } else if (edadNumero < 45) {
+    etapaVida = 'Consolidación';
+    mensajeEtapa =
+      'Momento en el que suele buscarse equilibrio entre crecimiento y estabilidad.';
+  } else if (edadNumero < 60) {
+    etapaVida = 'Optimización';
+    mensajeEtapa =
+      'Etapa enfocada en optimizar recursos y prevenir desequilibrios futuros.';
+  } else {
+    etapaVida = 'Bienestar';
+    mensajeEtapa =
+      'Fase en la que el foco suele estar en bienestar general y calidad de vida.';
+  }
+
   const BotonAtras = () =>
     paso > 0 ? (
       <button
@@ -315,6 +341,14 @@ export default function Simulador() {
               <strong>{formatMoney(mesesCobertura)}</strong> meses de cobertura sin recibir ingresos
             </p>
 
+            {/* ETAPA DE VIDA – NUEVO */}
+            <div className="mb-4 text-sm text-slate-600">
+              <p>
+                <strong>Etapa de vida:</strong> {etapaVida}
+              </p>
+              <p>{mensajeEtapa}</p>
+            </div>
+
             <div className="card">
               <p className="font-semibold mb-1">Recomendación</p>
               <p className="text-sm">{recomendacion}</p>
@@ -386,6 +420,7 @@ export default function Simulador() {
     </main>
   );
 }
+
 
 
 
