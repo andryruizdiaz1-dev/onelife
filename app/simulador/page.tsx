@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 /* =======================
-   UTILIDADES
+   UTILIDADES NUMÉRICAS
 ======================= */
 function formatMoney(value: number) {
-  return value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return value
+    .toFixed(0)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 function formatInput(value: string) {
@@ -24,91 +26,147 @@ export default function Simulador() {
 
   const [moneda, setMoneda] = useState<'$' | 'USD'>('$');
   const [edad, setEdad] = useState('');
+
   const [ingresos, setIngresos] = useState('');
-  const [gastos, setGastos] = useState('');
+  const [gastosFijos, setGastosFijos] = useState('');
   const [ahorro, setAhorro] = useState('');
 
   const [anios, setAnios] = useState(10);
 
-  const [historial, setHistorial] = useState<any[]>([]);
-  const [salud, setSalud] = useState('');
+  /* =======================
+     CÁLCULOS
+  ======================= */
+  const ingresoMensual = cleanNumber(ingresos);
+  const ahorroMensual = cleanNumber(ahorro);
+  const gastoTotal = ingresoMensual - ahorroMensual;
 
-  const ingreso = cleanNumber(ingresos);
-  const gasto = cleanNumber(gastos);
-  const ahorroNum = cleanNumber(ahorro);
-
+  const ahorroProyectado = ahorroMensual * 12 * anios;
   const mesesCobertura =
-    gasto > 0 ? (ahorroNum * 12) / gasto : 0;
+    gastoTotal > 0 ? ahorroProyectado / gastoTotal : 0;
 
   /* =======================
-     EFECTO: GUARDAR HISTORIAL
+     ESTADO FINANCIERO
   ======================= */
-  useEffect(() => {
-    if (!ingresos || !gastos) return;
+  let estadoFinanciero = '';
+  let colorEstado = '';
 
-    const registro = {
-      fecha: new Date().toLocaleDateString(),
-      meses: Math.round(mesesCobertura),
-    };
-
-    const historialPrevio = JSON.parse(
-      localStorage.getItem('historial') || '[]'
-    );
-
-    localStorage.setItem(
-      'historial',
-      JSON.stringify([...historialPrevio, registro])
-    );
-
-    setHistorial([...historialPrevio, registro]);
-  }, [mesesCobertura]);
+  if (mesesCobertura >= 12) {
+    estadoFinanciero = '🟢 Salud financiera sólida';
+    colorEstado = 'text-green-600';
+  } else if (mesesCobertura >= 6) {
+    estadoFinanciero = '🟡 Atención: situación estable pero frágil';
+    colorEstado = 'text-yellow-600';
+  } else {
+    estadoFinanciero = '🔴 Riesgo financiero';
+    colorEstado = 'text-red-600';
+  }
 
   /* =======================
-     SALUD FINANCIERA
+     ETAPA DE VIDA
   ======================= */
-  useEffect(() => {
-    let score = 0;
+  let etapaVida = '';
+  let mensajeEtapa = '';
 
-    if (mesesCobertura >= 12) score += 2;
-    else if (mesesCobertura >= 6) score += 1;
+  const edadNumero = Number(edad);
 
-    if (edad && Number(edad) < 35) score += 1;
+  if (edadNumero < 30) {
+    etapaVida = 'Construcción';
+    mensajeEtapa = 'Etapa de formación de hábitos y crecimiento.';
+  } else if (edadNumero < 45) {
+    etapaVida = 'Consolidación';
+    mensajeEtapa = 'Momento de equilibrio entre ingresos y estabilidad.';
+  } else if (edadNumero < 60) {
+    etapaVida = 'Optimización';
+    mensajeEtapa = 'Enfoque en proteger y optimizar recursos.';
+  } else {
+    etapaVida = 'Bienestar';
+    mensajeEtapa = 'Prioridad en estabilidad y calidad de vida.';
+  }
 
-    if (score >= 3) setSalud('🟢 Salud financiera sólida');
-    else if (score === 2) setSalud('🟡 Situación estable, con margen de mejora');
-    else setSalud('🔴 Riesgo financiero');
-  }, [mesesCobertura, edad]);
+  const BotonAtras = () =>
+    paso > 0 ? (
+      <button
+        onClick={() => setPaso(paso - 1)}
+        className="text-sm text-slate-500 underline mt-3"
+      >
+        Atrás
+      </button>
+    ) : null;
 
-  /* =======================
-     UI
-  ======================= */
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-xl p-6 shadow-lg">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center px-6">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 text-center">
 
-        <h1 className="text-2xl font-bold text-center mb-4">OneLife</h1>
+        {paso === 0 && (
+          <>
+            <h1 className="text-4xl font-bold mb-4">OneLife</h1>
+            <p className="text-slate-600 mb-6">
+              Tu salud financiera en un solo lugar.
+            </p>
+            <button onClick={() => setPaso(1)} className="btn-primary">
+              Comenzar
+            </button>
+          </>
+        )}
 
-        <input className="input" placeholder="Edad" value={edad} onChange={e => setEdad(e.target.value)} />
-        <input className="input" placeholder="Ingresos mensuales" value={ingresos} onChange={e => setIngresos(e.target.value)} />
-        <input className="input" placeholder="Gastos mensuales" value={gastos} onChange={e => setGastos(e.target.value)} />
-        <input className="input" placeholder="Ahorro mensual" value={ahorro} onChange={e => setAhorro(e.target.value)} />
+        {paso === 1 && (
+          <>
+            <p className="step">Paso 1</p>
+            <h2 className="title">¿Cuál es tu edad?</h2>
+            <input className="input" value={edad} onChange={e => setEdad(e.target.value)} />
+            <button onClick={() => setPaso(2)} className="btn-primary">Siguiente</button>
+          </>
+        )}
 
-        <div className="mt-4 p-4 bg-slate-100 rounded">
-          <p className="font-semibold">Estado actual</p>
-          <p>{salud}</p>
-          <p>Meses cubiertos: {Math.round(mesesCobertura)}</p>
-        </div>
+        {paso === 2 && (
+          <>
+            <p className="step">Paso 2</p>
+            <h2 className="title">Ingresos mensuales</h2>
+            <input className="input" value={ingresos} onChange={e => setIngresos(e.target.value)} />
+            <button onClick={() => setPaso(3)} className="btn-primary">Siguiente</button>
+          </>
+        )}
 
-        <div className="mt-4 p-4 bg-blue-50 rounded">
-          <p className="font-semibold">Historial</p>
-          {historial.map((h, i) => (
-            <p key={i}>{h.fecha}: {h.meses} meses</p>
-          ))}
-        </div>
+        {paso === 3 && (
+          <>
+            <p className="step">Paso 3</p>
+            <h2 className="title">Gastos mensuales</h2>
+            <input className="input" value={gastosFijos} onChange={e => setGastosFijos(e.target.value)} />
+            <button onClick={() => setPaso(4)} className="btn-primary">Siguiente</button>
+          </>
+        )}
+
+        {paso === 4 && (
+          <>
+            <p className="step">Paso 4</p>
+            <h2 className="title">Ahorro mensual</h2>
+            <input className="input" value={ahorro} onChange={e => setAhorro(e.target.value)} />
+            <button onClick={() => setPaso(5)} className="btn-primary">Ver resultado</button>
+          </>
+        )}
+
+        {paso === 5 && (
+          <>
+            <h2 className={`text-2xl font-bold mb-2 ${colorEstado}`}>
+              {estadoFinanciero}
+            </h2>
+
+            <p className="mb-2">Meses cubiertos: {Math.round(mesesCobertura)}</p>
+            <p className="mb-2"><strong>Etapa:</strong> {etapaVida}</p>
+
+            <button
+              onClick={() => setPaso(0)}
+              className="text-sm text-indigo-600 underline mt-4"
+            >
+              Volver a empezar
+            </button>
+          </>
+        )}
       </div>
     </main>
   );
 }
+
 
 
 
