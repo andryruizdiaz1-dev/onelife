@@ -32,6 +32,10 @@ export default function Simulador() {
   const [ahorro, setAhorro] = useState('');
 
   const [anios, setAnios] = useState(10);
+  const [historial, setHistorial] = useState<
+    { fecha: string; meses: number; estado: string }[]
+  >([]);
+
 
   /* =======================
      CÁLCULOS
@@ -71,6 +75,16 @@ export default function Simulador() {
   let estado = '';
   let mensaje = '';
   let colorEstado = '';
+  const guardarSimulacion = () => {
+    const nuevaEntrada = {
+      fecha: new Date().toLocaleDateString(),
+      meses: Math.round(mesesCobertura),
+      estado: estado,
+    };
+
+    setHistorial((prev) => [nuevaEntrada, ...prev]);
+  };
+
 
   if (mesesCobertura >= 12) {
     estado = 'Bien';
@@ -340,6 +354,13 @@ export default function Simulador() {
             <p className="text-sm mb-4">
               <strong>{formatMoney(mesesCobertura)}</strong> meses de cobertura sin recibir ingresos
             </p>
+            <button
+              onClick={guardarSimulacion}
+              className="mt-3 text-sm text-indigo-600 underline"
+            >
+              Guardar resultado
+            </button>
+
 
             {/* ETAPA DE VIDA – NUEVO */}
             <div className="mb-4 text-sm text-slate-600">
@@ -353,6 +374,17 @@ export default function Simulador() {
               <p className="font-semibold mb-1">Recomendación</p>
               <p className="text-sm">{recomendacion}</p>
             </div>
+            {historial.length > 0 && (
+              <div className="card mt-4">
+                <p className="font-semibold mb-2">Historial de simulaciones</p>
+                {historial.map((h, i) => (
+                  <div key={i} className="text-sm mb-1">
+                    📅 {h.fecha} — {h.estado} ({h.meses} meses)
+                  </div>
+                ))}
+              </div>
+            )}
+
 
             <div className="card text-left">
               <p className="font-semibold mb-2 text-center">Escenarios</p>
