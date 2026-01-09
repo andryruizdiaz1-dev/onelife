@@ -54,20 +54,34 @@ export default function Simulador() {
   const mesesActuales = Math.floor(mesesCobertura);
   const mesesFaltantes = Math.max(objetivoMeses - mesesActuales, 0);
 
-  const mesesParaObjetivo =
-    ahorroMensual > 0
-      ? Math.ceil((mesesFaltantes * gastoTotal) / ahorroMensual)
-      : null;
+  const LIMITE_MESES_REALISTA = 60;
 
-  const ahorroObjetivoMensual =
-    mesesFaltantes > 0 ? Math.ceil((gastoTotal * objetivoMeses) / 12) : 0;
+  let mesesParaObjetivo: number | null = null;
 
-  const ahorroExtraNecesario = Math.max(
-    ahorroObjetivoMensual - ahorroMensual,
-    0
-  );
+  if (ahorroMensual > 0 && gastoTotal > 0 && mesesFaltantes > 0) {
+  const ahorroNecesario = mesesFaltantes * gastoTotal;
+  const mesesCalculados = ahorroNecesario / ahorroMensual;
+
+  if (mesesCalculados <= LIMITE_MESES_REALISTA) {
+    mesesParaObjetivo = Math.ceil(mesesCalculados);
+  }
+}
+
+let extraMensual: number | null = null;
+
+if (mesesParaObjetivo === null && mesesFaltantes > 0) {
+  const ahorroObjetivoTotal = mesesFaltantes * gastoTotal;
+  const ahorroMensualObjetivo =
+    ahorroObjetivoTotal / LIMITE_MESES_REALISTA;
+
+  const extra = ahorroMensualObjetivo - ahorroMensual;
+
+  if (extra > 0 && extra < ingresoMensual * 0.4) {
+    extraMensual = Math.ceil(extra);
+  }
+}
+
  
-
   /* =======================
      ESCENARIOS
   ======================= */
