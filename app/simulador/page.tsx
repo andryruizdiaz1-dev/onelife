@@ -32,6 +32,7 @@ export default function Simulador() {
   const [ahorro, setAhorro] = useState('');
 
   const [anios, setAnios] = useState(10);
+  const [objetivoMeses, setObjetivoMeses] = useState(12);
   const [historial, setHistorial] = useState<
     { fecha: string; meses: number; estado: string }[]
   >([]);
@@ -47,6 +48,25 @@ export default function Simulador() {
   const ahorroProyectado = ahorroMensual * 12 * anios;
   const mesesCobertura =
     gastoTotal > 0 ? ahorroProyectado / gastoTotal : 0;
+  /* =======================
+    OBJETIVO FINANCIERO (NUEVO)
+  ======================= */
+  const mesesActuales = Math.floor(mesesCobertura);
+  const mesesFaltantes = Math.max(objetivoMeses - mesesActuales, 0);
+
+  const mesesParaObjetivo =
+    ahorroMensual > 0
+      ? Math.ceil((mesesFaltantes * gastoTotal) / ahorroMensual)
+      : null;
+
+  const ahorroObjetivoMensual =
+    mesesFaltantes > 0 ? Math.ceil((gastoTotal * objetivoMeses) / 12) : 0;
+
+  const ahorroExtraNecesario = Math.max(
+    ahorroObjetivoMensual - ahorroMensual,
+    0
+  );
+ 
 
   /* =======================
      ESCENARIOS
@@ -353,6 +373,56 @@ export default function Simulador() {
 
             <p className="text-sm mb-4">
               <strong>{formatMoney(mesesCobertura)}</strong> meses de cobertura sin recibir ingresos
+              {/* =======================
+                 OBJETIVO FINANCIERO
+             ======================= */}
+             <div className="card mt-4 text-left">
+               <p className="font-semibold mb-2 text-center">🏁 Tu objetivo financiero</p>
+
+               <div className="flex items-center gap-2 mb-3 justify-center">
+                 <span>Quiero tener</span>
+                 <input
+                   type="number"
+                   min={1}
+                   max={36}
+                   value={objetivoMeses}
+                   onChange={(e) => setObjetivoMeses(Number(e.target.value))}
+                   className="w-20 border rounded px-2 py-1 text-center"
+                 />
+                 <span>meses de cobertura</span>
+               </div>
+
+               <p className="text-sm text-center mb-2">
+                 Hoy tenés <strong>{mesesActuales}</strong> meses.
+               </p>
+
+               {mesesFaltantes === 0 ? (
+                 <p className="text-sm text-green-600 text-center">
+                   🎉 Ya alcanzaste tu objetivo financiero.
+                 </p>
+               ) : (
+                 <>
+                  <p className="text-sm text-center mb-1">
+                    Te faltan <strong>{mesesFaltantes}</strong> meses para llegar.
+                  </p>
+
+                 {mesesParaObjetivo && (
+                   <p className="text-sm text-center mb-1">
+                     Con tu ahorro actual, lo alcanzarías en{' '}
+                     <strong>{mesesParaObjetivo}</strong> meses.
+                   </p>
+                 )}
+
+                 {ahorroExtraNecesario > 0 && (
+                   <p className="text-xs text-slate-600 text-center mt-1">
+                      Ahorrando <strong>{moneda} {formatMoney(ahorroExtraNecesario)}</strong> más por mes,
+                      podrías llegar antes.
+                    </p>
+                 )}
+               </>
+             )}
+           </div>
+
             </p>
             <button
               onClick={guardarSimulacion}
