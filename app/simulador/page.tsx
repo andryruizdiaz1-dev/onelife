@@ -43,7 +43,7 @@ export default function Simulador() {
   ======================= */
   const ingresoMensual = cleanNumber(ingresos);
   const ahorroMensual = cleanNumber(ahorro);
-  const gastoTotal = ingresoMensual - ahorroMensual;
+  const gastoTotal = cleanNumber(gastosFijos);
 
   const ahorroProyectado = ahorroMensual * 12 * anios;
   const mesesCobertura =
