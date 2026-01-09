@@ -115,7 +115,7 @@ if (mesesParaObjetivo === null && mesesFaltantes > 0) {
   const guardarSimulacion = () => {
     const nuevaEntrada = {
       fecha: new Date().toLocaleDateString(),
-      meses: Math.round(mesesCobertura),
+      meses: mesesCoberturaRedondeados,
       estado: estado,
     };
 
@@ -431,12 +431,13 @@ if (mesesParaObjetivo === null && mesesFaltantes > 0) {
                    </p>
                  )}
 
-                 {ahorroExtraNecesario > 0 && (
+                 {extraMensual !== null && extraMensual > 0 && (
                    <p className="text-xs text-slate-600 text-center mt-1">
-                      Ahorrando <strong>{moneda} {formatMoney(ahorroExtraNecesario)}</strong> más por mes,
-                      podrías llegar antes.
-                    </p>
+                     Ahorrando <strong>{moneda} {formatMoney(extraMensual)}</strong> más por mes,
+                     podrías llegar antes.
+                   </p>
                  )}
+
                </>
              )}
            </div>
