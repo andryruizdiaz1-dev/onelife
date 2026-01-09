@@ -52,7 +52,7 @@ export default function Simulador() {
     OBJETIVO FINANCIERO (NUEVO)
   ======================= */
   const mesesActuales = Math.floor(mesesCobertura);
-  const mesesFaltantes = Math.max(objetivoMeses - mesesActuales, 0);
+  const mesesActuales = Math.round(mesesCobertura);
 
   const LIMITE_MESES_REALISTA = 60;
 
