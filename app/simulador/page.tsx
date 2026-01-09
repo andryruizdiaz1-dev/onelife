@@ -48,10 +48,12 @@ export default function Simulador() {
   const ahorroProyectado = ahorroMensual * 12 * anios;
   const mesesCobertura =
     gastoTotal > 0 ? ahorroProyectado / gastoTotal : 0;
+    const mesesCoberturaRedondeados = Math.round(mesesCobertura);
+
   /* =======================
     OBJETIVO FINANCIERO (NUEVO)
   ======================= */
-  const mesesActuales = Math.round(mesesCobertura);
+  const mesesActuales = mesesCoberturaRedondeados;
   const mesesFaltantes = Math.max(objetivoMeses - mesesActuales, 0);
 
   const LIMITE_MESES_REALISTA = 60;
@@ -386,7 +388,8 @@ if (mesesParaObjetivo === null && mesesFaltantes > 0) {
             <p className="mb-4">{mensaje}</p>
 
             <p className="text-sm mb-4">
-              <strong>{formatMoney(mesesCobertura)}</strong> meses de cobertura sin recibir ingresos
+              <strong>{mesesCoberturaRedondeados}</strong> meses de cobertura sin recibir ingresos
+
               {/* =======================
                  OBJETIVO FINANCIERO
              ======================= */}
