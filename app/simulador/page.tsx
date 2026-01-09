@@ -48,7 +48,8 @@ export default function Simulador() {
   const ahorroProyectado = ahorroMensual * 12 * anios;
   const mesesCobertura =
     gastoTotal > 0 ? ahorroProyectado / gastoTotal : 0;
-    const mesesCoberturaRedondeados = Math.round(mesesCobertura);
+    const mesesCoberturaRedondeados = Math.floor(mesesCobertura);
+
 
   /* =======================
     OBJETIVO FINANCIERO (NUEVO)
